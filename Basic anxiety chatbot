@@ -1,0 +1,447 @@
+import os
+import random
+import tkinter as tk
+import tkinter
+from tkinter import *
+import customtkinter
+from PIL import ImageTk,Image
+import pathlib
+import pygame
+responses = {
+    "anxiety": {
+        "triggers": ["worried", "concerned", "nervous", "tense", "overwhelmed", "panic", "fearful", "conflicted",
+                     "trapped", "helpless", "hopeless", "worthless", "desperate", "lost", "abandoned", "isolated",
+                     "alone", "sad", "depressed","can't relax","agitated","anxiety","attack","bad"],
+        "greetings": ["hello", "hi", "hey", "howdy","hola"],
+        "responses": [
+            "It's understandable to feel concerned about that. Would you like to talk more about what's worrying you?",
+            "It's okay to feel nervous sometimes. Is there anything specific making you feel this way?",
+            "I hear you. Taking deep breaths or trying some relaxation techniques might help. Would you like to try?",
+            "Feeling overwhelmed can be tough. Let's break things down together. What's the most pressing thing you need to address?",
+            "It sounds like you're having a tough time. Let's focus on your breathing. Take deep breaths with me, in and out.",
+            "Fear can be powerful, but remember, you're not alone. We can work through this together. What can I do to support you?",
+            "It's hard when your mind feels like it's in overdrive. Let's try some grounding exercises together to help slow things down.",
+            "Relaxation can be challenging, but let's find something that helps you unwind. Would you like to try a guided meditation or listen to calming music?",
+            "It's tough when your mind feels scattered. Let's take a short break and come back to it. Would you like to take a walk or do something else to clear your mind?",
+            "Constantly feeling on edge can be exhausting. Let's explore some coping strategies together. What helps you feel more grounded?",
+            "I understand. Irritability often accompanies anxiety. Let's figure out what's triggering it. Is there something specific bothering you?",
+            "Sleep disturbances can be tough. Let's establish a bedtime routine to help you relax. Would you like to try some calming activities before bed?",
+            "A racing heart can be scary, but it's often a symptom of anxiety. Let's focus on slowing down your breathing together.",
+            "Sweating can be a physical reaction to stress. Let's find a cool, quiet space where you can take some deep breaths and relax.",
+            "It sounds like your body is reacting to stress. Let's try some grounding exercises together to help you feel more stable.",
+            "Agitation is a common response to anxiety. Let's find a calming activity to help you relax. Would you like to try some gentle stretching?",
+            "Feeling strained can be exhausting. Let's find ways to lighten your load. Is there something I can help you with?",
+            "Feeling uneasy is tough, but it's okay to feel this way sometimes. Let's explore what might be causing it. Is there something on your mind?",
+           "Anxiety can be overwhelming, but remember, you're not alone. Let's talk about what's causing your anxiety and how we can address it together.",
+           "Palpitations can be frightening, but they're often a symptom of anxiety. Let's focus on slowing down your breathing together.",
+           "Shortness of breath can be distressing, but focusing on your breath can help. Let's try some deep breathing exercises together.",
+           "Clenching your jaw is a common response to stress. Let's try some relaxation techniques together to help ease the tension.",
+           "Muscle tension is a common physical symptom of anxiety. Let's try some gentle stretching exercises to help relieve the tension.",
+           "An upset stomach is often a sign of stress. Let's try some soothing herbal tea or gentle foods to help settle your stomach.",
+           "Dizziness can be disorienting, but it's often a symptom of anxiety. Let's find a quiet place where you can sit down and rest for a moment.",
+           "Headaches can be tough to deal with, especially when they're persistent. Let's try some relaxation techniques to help ease the tension.",
+           "Fatigue is a common symptom of anxiety. Let's take things slowly and focus on self."
+    ,
+           "Avoidance can sometimes feel like the easiest option, but it can also perpetuate anxiety. Let's explore ways to face your fears together."
+    ,
+           "It's natural to feel apprehensive sometimes, but it's important not to let fear hold you back. Let's talk about your concerns and how we can address them."
+    ,
+           "Feeling jittery is a common symptom of anxiety. Let's find a calming activity to help you relax. Would you like to try some deep breathing exercises?"
+    ,
+           "Fidgeting can be a sign of nervousness. Let's find a way to channel that nervous energy into something productive. Would you like to try going for a walk?"
+    ,
+           "Hyperventilating can be scary, but it's often a symptom of anxiety. Let's focus on slowing down your breathing together."
+    , "Feeling frazzled is tough, but it's important to take breaks and practice self."
+    ,
+           "Distress can be overwhelming, but it's important to reach out for support. Let's talk about what's distressing you and how we can help."
+    ,
+           "Feeling aggravated is tough, but it's important to find healthy ways to manage your anger. Let's talk about what's bothering you and how we can address it."
+    ,
+           "Feeling stressed out is tough, but it's important to take breaks and practice selfcare. Let's talk about some strategies to help you relax."
+    ,
+           "Feeling frantic can be overwhelming, but it's important to take a step back and focus on what's most important. Let's prioritize your tasks together."
+    ,
+           "Feeling hesitant is natural, especially when faced with uncertainty. Let's explore your concerns together. Is there something specific you're hesitant about?"
+    ,
+           "Feeling timid can be tough, but it's important to remember your strengths. Let's focus on building your confidence. What's one thing you feel confident about?"
+    ,
+           "Feeling shaky can be unsettling, but it's often a symptom of anxiety. Let's try some grounding exercises together to help you feel more stable."
+    ,
+           "Feeling unsteady can be disorienting, but it's important to find ways to steady yourself. Let's find a quiet place where you can sit down and rest for a moment."
+    ,
+           "Feeling skittish can be tough, especially when you're feeling on edge. Let's find a calming activity to help you relax. Would you like to try some deep breathing exercises?"
+    ,
+           "Feeling wary is natural, especially when faced with uncertainty. Let's explore your concerns together. Is there something specific you're wary of?"
+    ,
+           "Feeling jumpy is a common response to anxiety. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Feeling paranoid can be distressing, but it's important to remember that your thoughts aren't always accurate reflections of reality. Let's talk through your concerns together."
+    ,
+           "Feeling self-conscious is tough, but it's important to remember that everyone has insecurities. Let's focus on building your confidence. What's one thing you like about yourself?"
+    ,
+           "Feeling panicky can be overwhelming, but it's important to remember that panic attacks are temporary. Let's focus on slowing down your breathing together."
+    ,
+           "Feeling cautious is natural, especially when faced with uncertainty. Let's explore your concerns together. Is there something specific you're cautious about?"
+    ,
+           "Feeling indecisive is tough, but it's important to trust your instincts. Let's talk through your options together. Is there something specific you're struggling to decide?"
+    ,
+           "Feeling agonized is tough, but it's important to reach out for support. Let's talk about what's agonizing you and how we can help."
+    ,
+           "Feeling pained is tough, especially when it's emotional pain. Let's talk about what's causing you pain and how we can address it together."
+    ,
+           "Feeling restive is tough, but it's important to find ways to relax and unwind. Let's talk about some strategies to help you feel more at ease."
+    ,
+           "A throbbing heart can be a sign of anxiety, but it's important to remember to take deep breaths and try to calm yourself. Let's try some relaxation exercises together."
+    ,
+           "Feeling aflutter can be unsettling, especially when you're feeling anxious. Let's find a calming activity to help you relax. Would you like to try some deep breathing exercises?"
+    ,
+           "Experiencing goosebumps is a common physical response to anxiety. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Palpitations can be frightening, but they're often a symptom of anxiety. Let's focus on slowing down your breathing together."
+    ,
+           "Feeling startled can be unsettling, but it's important to remember that it's a normal response to unexpected stimuli. Let's take a moment to catch our breath and calm down."
+    ,
+           "Feeling intense emotions can be overwhelming, but it's important to remember that they're temporary. Let's find a calming activity to help you relax. Would you like to try some deep breathing exercises?"
+    ,
+           "Feeling dread is tough, but it's important to remember that things aren't always as bad as they seem. Let's talk through your concerns together and come up with a plan."
+    ,
+           "Feeling apprehensive is natural, especially when faced with uncertainty. Let's explore your concerns together. Is there something specific you're apprehensive about?"
+    ,
+           "Feeling perplexed is tough, especially when you're feeling overwhelmed. Let's break things down together and try to make sense of what's going on."
+    ,
+           "Feeling agonized is tough, but it's important to reach out for support. Let's talk about what's agonizing you and how we can help."
+    ,
+           "Feeling edgy is tough, but it's important to find ways to relax and unwind. Let's talk about some strategies to help you feel more at ease."
+    ,
+           "Feeling distraught is tough, but it's important to reach out for support. Let's talk about what's distressing you and how we can help."
+    ,
+           "Feeling shaken is tough, but it's important to take some time to recover. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Feeling in turmoil is tough, but it's important to take some time to process your emotions. Let's find a quiet place where you can reflect and try to find some peace."
+    ,
+           "Feeling nauseous is tough, but it's important to try to settle your stomach. Let's find some gentle foods or herbal teas that might help."
+    ,
+           "Feeling wobbly can be disorienting, but it's important to find a stable place to sit down and rest. Let's take a moment to catch our breath and calm down."
+    ,
+           "Feeling quivery can be unsettling, but it's important to try to steady yourself. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Feeling unnerved is tough, but it's important to try to find a sense of calm. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Experiencing numbness can be disconcerting, but it's important to try to reconnect with your body. Let's try some grounding exercises together."
+    ,
+           "Feeling stifled is tough, especially when you're feeling overwhelmed. Let's find a way to help you express yourself. Would you like to try journaling or drawing?"
+    ,
+           "Feeling frozen with fear can be paralyzing, but it's important to try to take small steps forward. Let's start by taking some deep breaths together."
+    ,
+           "A churning stomach can be uncomfortable, but it's often a sign of stress. Let's find some gentle foods or herbal teas that might help settle your stomach."
+    ,
+           "Feeling winded can be distressing, especially when you're feeling anxious. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Feeling giddy can be disorienting, but it's important to try to steady yourself. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Feeling twitchy is a common response to anxiety. Let's find a quiet place where you can sit down and try to relax your muscles. Would you like to try some gentle stretching?"
+    ,
+           "Feeling desperate is tough, but it's important to reach out for support. Let's talk about what's distressing you and how we can help."
+    ,
+           "Experiencing anxiousness is tough, but it's important to remember that it's a normal response to stress. Let's try some relaxation exercises together to help ease your anxiety."
+    ,
+           "Feeling obsessive is tough, but it's important to try to redirect your focus. Let's find a calming activity to help distract you. Would you like to try some deep breathing exercises?"
+    ,
+           "Feeling compulsive is tough, but it's important to try to regain control. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Feeling paralyzed with fear can be overwhelming, but it's important to remember that you're not alone. Let's focus on taking small steps forward together."
+    ,
+           "Feeling faint can be frightening, but it's often a symptom of anxiety. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Feeling hysterical can be overwhelming, but it's important to try to calm yourself down. Let's focus on slowing down your breathing together."
+    ,
+           "Feeling strungout is tough, but it's important to try to find ways to relax and unwind. Let's find a quiet place where you can sit down and take some deep breaths to help calm your nerves."
+    ,
+           "Feeling anguished is tough, but it's important to reach out for support. Let's talk about what's distressing you and how we can help."
+    ,
+           "Feeling disturbed is tough, but it's important to reach out for support. Let's talk about what's distressing you and how we can help."
+    ,
+           "Feeling uncomfortable is tough, but it's important to try to find ways to soothe yourself. Let's find a calming activity to help you relax. Would you like to try some deep breathing exercises?"
+    ,
+           "Feeling petrified is tough, but it's important to remember that you're not alone. Let's focus on taking small steps forward together."
+    ,
+           "Feeling conflicted is tough, but it's important to take some time to explore your feelings. Let's talk through your options together and come up with a plan."
+    ,
+           "Feeling trapped is tough, but it's important to remember that there are always options. Let's explore your options together and come up with a plan."
+    ,
+           "Feeling helpless is tough, but it's important to remember that there are always things you can do to help yourself. Let's explore some coping strategies together."
+    ,
+           "Feeling hopeless is tough, but it's important to remember that things can get better. Let's focus on finding some small things to feel hopeful about."
+    ,
+           "Feeling worthless is tough, but it's important to remember that your worth isn't determined by your circumstances. Let's focus on building your self	esteem together."
+    ,
+           "Feeling desperate is tough, but it's important to remember that there are always options. Let's explore some coping strategies together and come up with a plan."
+    ,
+           "Feeling lost is tough, but it's important to remember that you're not alone. Let's focus on finding some direction together."
+    ,
+           "Feeling abandoned is tough, but it's important to remember that you're not alone. Let's focus on finding some support together."
+    ,
+           "Feeling isolated is tough, but it's important to remember that there are people who care about you. Let's focus on finding some connections together."
+    ,
+           "Feeling alone is tough, but it's important to remember that there are people who care about you. Let's focus on finding some connections together."
+    ,
+           "Feeling like you can't go on is tough, but it's important to remember that there is hope. Let's focus on finding some reasons to keep going together."
+        ],
+        "exercises": ["Take deep breaths", "Wash your face", "Smell your favorite scent!", "Eat your favorite food",
+                      "Try singing out your favorite song out aloud", "Hum your favorite melodies",
+           "Have a stress ball at hand? go and grab it",
+           "Fan of art? grab your favorite color pencils or paints, Let your emotions flow sweetheart!",
+           "Want to vent yourself out, look no further grab a pen and paper and write your frustrations out, or got no pen? open your notepad and type it out dearest.",
+           "Take a bath, wash all off that weighs you down", "Night time yet? Count the stars in the sky",
+           "Day time, go outside and take a walk", "Want some company? Call your favorite person",
+           "Drink a glass of water", "Eat your favorite candy or snack!",
+           "Stay silent and try focusing on your surroundings", "Listen to your heartbeat and close your eyes",
+           "Practice progressive muscle relaxation by tensing and then relaxing each muscle group in your body, one at a time.",
+           "Do a guided meditation or mindfulness exercise.",
+           "Practice gratitude by listing things you're thankful for.",
+           "Do some gentle stretching or yoga.",
+           "Listen to calming music or nature sounds.",
+           "Watch a funny movie or TV show to lift your mood.",
+           "Squeeze a stress ball or play with putty to release tension.",
+           "Visualize yourself in a peaceful place, like a beach or forest.",
+           "Write down your worries and then set them aside for later.",
+           "Practice deep breathing exercises, such as the 4-7-8 technique.",
+           "Engage in a hobby or activity that brings you joy, like painting or gardening.",
+           "Connect with a friend or loved one for emotional support.",
+           "Try aromatherapy with essential oils like lavender or chamomile.",
+           "Savor a warm cup of herbal tea.",
+           "Do a puzzle or brain teaser to distract your mind.",
+           "Practice grounding techniques, like focusing on the sensation of your feet on the ground.",
+           "Use a stress-relief app or online resource for guided exercises.",
+           "Do some gentle aerobic exercise, like walking or biking.",
+           "Create a calming bedtime routine to improve sleep quality.",
+           "Write in a journal to express your thoughts and feelings.",
+           "Practice self-compassion by speaking to yourself kindly and offering comfort.",
+           "Engage in progressive relaxation by tensing and releasing each muscle group.",
+           "Listen to a guided visualization or relaxation recording.",
+           "Engage in deep, belly breathing to activate the body's relaxation response.",
+           "Use positive affirmations to challenge negative thoughts.",
+           "Take a break from screens and spend time in nature.",
+           "Engage in a creative activity like drawing, knitting, or crafting.",
+           "Practice mindfulness by focusing on the present moment without judgment.",
+           "Engage in physical activity you enjoy, like dancing or playing sports.",
+           "Take a warm bath with soothing bath salts or bubbles.",
+           "Use a weighted blanket or hug yourself tightly for comfort.",
+           "Practice smiling or laughing, even if you don't feel like it.",
+           "Read a book or listen to an audiobook for relaxation.",
+           "Practice gentle self-massage to release tension in your muscles.",
+           "Engage in guided imagery to imagine yourself in a peaceful place.",
+           "Do a body scan meditation to check in with each part of your body.",
+           "Practice box breathing by inhaling for four counts, holding for four counts, exhaling for four counts, and holding for four counts.",
+           "Write a letter to yourself expressing compassion and understanding.",
+           "Create a gratitude journal and write down three things you're grateful for each day.",
+           "Engage in progressive relaxation by tensing and releasing each muscle group.",
+           "Listen to a guided visualization or relaxation recording.",
+           "Engage in deep, belly breathing to activate the body's relaxation response.",
+           "Use positive affirmations to challenge negative thoughts.",
+           "Take a break from screens and spend time in nature.",
+           "Engage in a creative activity like drawing, knitting, or crafting.",
+           "Practice mindfulness by focusing on the present moment without judgment.",
+           "Engage in physical activity you enjoy, like dancing or playing sports.",
+           "Take a warm bath with soothing bath salts or bubbles.",
+           "Use a weighted blanket or hug yourself tightly for comfort.",
+           "Practice smiling or laughing, even if you don't feel like it.",
+           "Read a book or listen to an audiobook for relaxation.",
+           "Practice gentle self-massage to release tension in your muscles.",
+           "Engage in guided imagery to imagine yourself in a peaceful place.",
+           "Do a body scan meditation to check in with each part of your body.",
+           "Practice box breathing by inhaling for four counts, holding for four counts, exhaling for four counts, and holding for four counts.",
+           "Write a letter to yourself expressing compassion and understanding.",
+           "Create a gratitude journal and write down three things you're grateful for each day.",
+           "Engage in progressive relaxation by tensing and releasing each muscle group.",
+           "Listen to a guided visualization or relaxation recording.",
+           "Engage in deep, belly breathing to activate the body's relaxation response.",
+           "Use positive affirmations to challenge negative thoughts.",
+           "Take a break from screens and spend time in nature.",
+           "Engage in a creative activity like drawing, knitting, or crafting.",
+           "Practice mindfulness by focusing on the present moment without judgment.",
+           "Engage in physical activity you enjoy, like dancing or playing sports.",
+           "Take a warm bath with soothing bath salts or bubbles.",
+           "Use a weighted blanket or hug yourself tightly for comfort.",
+           "Practice smiling or laughing, even if you don't feel like it.",
+           "Read a book or listen to an audiobook for relaxation.",
+           "Practice gentle self-massage to release tension in your muscles.",
+           "Engage in guided imagery to imagine yourself in a peaceful place.",
+           "Do a body scan meditation to check in with each part of your body.",
+           "Practice box breathing by inhaling for four counts, holding for four counts, exhaling for four counts, and holding for four counts.",
+           "Write a letter to yourself expressing compassion and understanding.",
+           "Create a gratitude journal and write down three things you're grateful for each day."]
+    },
+    # "gratitude": {
+    #     "responses": ["You're welcome!"]
+    # },
+    # "goodbye": {
+    #     "responses": ["Farewell for now!"]
+    # }
+}
+jokes = ["Why don't scientists trust atoms? Because they make up everything!",
+         "I'm reading a book on anti-gravity. It's impossible to put down!",
+         "Why did the scarecrow win an award? Because he was outstanding in his field!",
+         "Why did the scarecrow win an award? Because he was outstanding in his field!",
+         "I told my wife she was drawing her eyebrows too high. She looked surprised!",
+         "Why don't skeletons fight each other? They don't have the guts!",
+         "Parallel lines have so much in common. It's a shame they'll never meet!",
+         "I told my computer I needed a break. Now it won't stop sending me vacation ads!",
+         "Why did the bicycle fall over? Because it was two-tired!",
+         "I'm reading a book on anti-gravity. It's impossible to put down!",
+         "Why did the golfer bring two pairs of pants? In case he got a hole in one!",
+         "I used to play piano by ear, but now I use my hands!",
+         "Why did the tomato turn red? Because it saw the salad dressing!",
+         "Why did the chicken join a band? Because it had the drumsticks!",
+         "I told my friend 10 jokes to make him laugh. Sadly, no pun in ten did.",
+         "What do you call fake spaghetti? An impasta!",
+         "I'm on a whiskey diet. I've lost three days already!",
+         "Why was the math book sad? Because it had too many problems!",
+         "Why did the tomato blush? Because it saw the salad dressing!",
+         "I'm reading a book about anti-gravity. It's impossible to put down!",
+         "Why don't skeletons fight each other? They don't have the guts!",
+         "I'm terrified of elevators, so I'm going to start taking steps to avoid them!",
+         "Why don't scientists trust stairs? Because they're always up to something!",
+         "I'm trying to organize a hide and seek competition, but it's really hard to find good players!",
+         "Why don't eggs tell jokes? Because they'd crack each other up!",
+         "I'm reading a book on the history of glue. I just can't seem to put it down!",
+         "Why don't oysters donate to charity? Because they're shellfish!",
+         "Why did the coffee file a police report? It got mugged!",
+         "Why did the man put his money in the blender? He wanted to make liquid assets!",
+         "Why don't skeletons fight each other? They don't have the stomach for it!",
+         "I told my wife she should embrace her mistakes. She gave me a hug!",
+         "Why did the scarecrow become a successful neurosurgeon? Because he was outstanding in his field!",
+         "Why did the belt go to jail? It held up a pair of pants!",
+         "Why did the golfer bring two pairs of socks? In case he got a hole in one!",
+         "Why did the tomato stop in the middle of the road? It ran out of juice!",
+         "I'm reading a book on anti-gravity. It's really uplifting!",
+         "Why don't scientists trust atoms? Because they make up everything!",
+         "Why was the math book sad? Because it had too many problems!",
+         "Why did the tomato blush? Because it saw the salad dressing!",
+         "I'm terrified of elevators, so I'm going to start taking steps to avoid them!",
+         "I used to play piano by ear, but now I use my hands!",
+         "Why did the chicken join a band? Because it had the drumsticks!",
+         "I told my friend 10 jokes to make him laugh. Sadly, no pun in ten did.",
+         "What do you call fake spaghetti? An impasta!",
+         "I'm on a whiskey diet. I've lost three days already!",
+         "Why did the bicycle fall over? Because it was two-tired!",
+         "I told my computer I needed a break. Now it won't stop sending me vacation ads!",
+         "Parallel lines have so much in common. It's a shame they'll never meet!",
+         "Why don't skeletons fight each other? They don't have the guts!",
+         "I'm reading a book on anti-gravity. It's impossible to put down!",
+         "Why did the golfer bring two pairs of pants? In case he got a hole in one!",
+         "I used to play piano by ear, but now I use my hands!",
+         "Why did the tomato turn red? Because it saw the salad dressing!",
+         "Why did the chicken join a band? Because it had the drumsticks!",
+         "I told my friend 10 jokes to make him laugh. Sadly, no pun in ten did.",
+         "What do you call fake spaghetti? An impasta!",
+         "I'm on a whiskey diet. I've lost three days already!",
+         "Why was the math book sad? Because it had too many problems!",
+         "Why did the tomato blush? Because it saw the salad dressing!",
+         "I'm reading a book about anti-gravity. It's impossible to put down!",
+         "Why don't skeletons fight each other? They don't have the guts!",
+         "I'm terrified of elevators, so I'm going to start taking steps to avoid them!",
+         "Why don't scientists trust stairs? Because they're always up to something!",
+         "I'm trying to organize a hide and seek competition, but it's really hard to find good players!",
+         "Why don't eggs tell jokes? Because they'd crack each other up!",
+         "I'm reading a book on the history of glue. I just can't seem to put it down!",
+         "Why don't oysters donate to charity? Because they're shellfish!",
+         "Why did the coffee file a police report? It got mugged!",
+         "Why did the man put his money in the blender? He wanted to make liquid assets!",
+         "Why did the belt go to jail? It held up a pair of pants!",
+         "Why did the golfer bring two pairs of socks? In case he got a hole in one!",
+         "Why did the tomato stop in the middle of the road? It ran out of juice!",
+         "I'm reading a book on anti-gravity. It's really uplifting!"
+]
+root = customtkinter.CTk()
+# root = Tk()
+customtkinter.set_default_color_theme("green")
+root.title("ANXI_TALK!")
+background_image_path = "C:\\Users\\USER\\PycharmProjects\\pythonProject\\cute4.png"
+background_image = Image.open(background_image_path)
+background_image = background_image.resize((800, 700))
+background_photo = ImageTk.PhotoImage(background_image)
+canvas = tk.Canvas(root, width=800, height=600)
+canvas.pack(fill="both", expand=True)
+canvas.create_image(0, 0, image=background_photo, anchor="nw")
+chatbot_frame = tk.Frame(canvas)
+chatbot_frame.place(relx=0.5, rely=0.5, anchor="center")
+# character_label = tk.Label(chatbot_frame, image=background_photo)
+# character_label.pack(side=tk.LEFT)
+response_text = tk.Text(chatbot_frame, height=15, width=55)
+response_text.pack(side=tk.LEFT, padx=(10, 0))
+scrollbar = tk.Scrollbar(chatbot_frame, command=response_text.yview)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+response_text.config(yscrollcommand=scrollbar.set)
+user_frame = tk.Frame(root)
+user_frame.pack(pady=(0, 10))
+
+
+def calling_helpline():
+    umang = "03117786264"
+    response_text.insert(tk.END, "Call initiated,will contact with emergency service soon.")
+
+
+# Function to handle user input
+def handle_input():
+    user_input = user_entry.get().lower()
+    response = get_response(user_input)
+    display_response("User: " + user_input)
+    display_response("ANXI_TALK: " + response)
+    user_entry.delete(0, tk.END)
+def get_response(user_input):
+    for category, data in responses.items():
+        if "greetings" in data:
+            for greeting in data["greetings"]:
+                if greeting in user_input:
+                    return "Hello! How are you feeling today?"
+        if "triggers" in data:
+            for trigger in data["triggers"]:
+                if trigger in user_input:
+                    return random.choice(data["responses"])
+        elif category == "jokes":
+            return random.choice(jokes)
+    return "I'm not sure how to respond to that."
+def display_response(response):
+    response_text.insert(tk.END, response + "\n")
+user_entry = tk.Entry(user_frame, width=85)
+user_entry.pack(side=tk.LEFT, padx=(10, 10))
+send_button = tk.Button(user_frame, text="Send", command=handle_input)
+send_button.pack(side=tk.LEFT)
+def display_exercises():
+    exercise = random.choice(responses["anxiety"]["exercises"])
+    display_response("ANXI_TALK: Try this anxiety-relief exercise: " + exercise)
+
+
+exercise_button = tk.Button(root, text="Request Exercise", command=display_exercises)
+exercise_button.pack(pady=(10, 10))
+
+
+
+customtkinter.set_appearance_mode("dark")
+def display_joke():
+    joke = random.choice(jokes)
+    display_response("ANXI_TALK: " + joke)
+joke_button = tk.Button(root, text="Tell me a Joke", command=display_joke)
+joke_button.pack(pady=(10, 10))
+def randomly_play_song(song_directory):
+    songs = os.listdir(song_directory)
+    random_song = random.choice(songs)
+    song_path = os.path.join(song_directory, random_song)
+    os.startfile(song_path)
+    pygame.init()
+    pygame.mixer.music.load(song_directory)
+    pygame.mixer.music.play()
+song_directory ="C:\\Users\\USER\\PycharmProjects\\pythonProject\\songss"
+play_button = tk.Button(root, text="Play Music", command=lambda: randomly_play_song(song_directory))
+play_button.pack(pady=(0, 10))
+def clear_chat():
+    response_text.delete(1.0, tk.END)
+
+clear_button = tk.Button(root, text="Clear Chat", command=clear_chat)
+clear_button.pack(pady=(5, 10))
+# emergency_frame = tk.Frame(root)
+# emergency_frame.pack(pady=(5, 10))
+emergency_button = tk.Button(root, text="Helpline", command=calling_helpline)
+emergency_button.pack(pady=(5, 15))
+root.mainloop()
