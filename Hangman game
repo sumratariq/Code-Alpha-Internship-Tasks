@@ -1,0 +1,30 @@
+import random
+
+count = 5
+word_library = ["mango", "paper", "star", "apple", "pear", "fruit", "vegetable", "application", "brain", "book", "copy",
+                "pencil", "alphabet", "driver"]
+correct_word = random.choice(word_library)
+guessed_letters = ["_"] * len(correct_word)
+print("The word has", len(correct_word), "letters.")
+
+while count > 0:
+    print("\nYou have", count, "guesses left.")
+    user_input = input("Guess a letter: ")
+    if len(user_input) != 1 or not user_input.isalpha():
+        print("Please enter a single letter.")
+        continue
+
+    if user_input in correct_word:
+        print("Yes, that letter is in the word!")
+        for index, letter in enumerate(correct_word):
+            if letter == user_input:
+                guessed_letters[index] = user_input
+    else:
+        print("No, that letter is not in the word.")
+        count = count-1
+    print("Current word:", " ".join(guessed_letters))
+    if "_" not in guessed_letters:
+        print("\nCongratulations! You've guessed the word:", correct_word)
+        break
+else:
+    print("\nSorry, you've run out of guesses. The word was:", correct_word)
